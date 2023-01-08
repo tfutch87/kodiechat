@@ -96,4 +96,6 @@ p#randomQuote > p {
 
 #bottom-section{
   transition: all ease-in-out 500ms;
+  width: 100%;
+  max-width: 500px;
 }

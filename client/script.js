@@ -123,9 +123,11 @@ form.addEventListener('keyup', (e) => {
     }
 })
 
+const closeButton = document.getElementById('LetsChatButton');
 
+closeButton.addEventListener('click', closePopUp );
 
-function closePopUp(e){
+function closePopUp(){
 
     // e.preventDefault();
     

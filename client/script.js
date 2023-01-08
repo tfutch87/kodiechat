@@ -129,12 +129,18 @@ function closePopUp(){
     
     const tl = gsap.timeline()
 
+    document.body.style = 'overflow: auto;'
+
     tl.to('.pop-section', {
         y: '1100',
         duration: 0.50,
         opacity: 0,
 
     })
+
+    tl.to('#form', {y:0});
+
+    tl.to('.footer-text', {y:0})
 
 }
 
@@ -143,7 +149,7 @@ function closePopUp(){
 async function renderData() {
     const response = await fetch('https://uselessfacts.jsph.pl/random.json?language=en');
     const data = await response.json();
-    document.querySelector('#randomQuote').innerHTML = ` <p>Did you know?</p> ${data.text}`;
+    document.querySelector('#randomQuote').innerHTML = `<p>Did you know?</p> <p>${data.text}</p>`;
   }
 
   renderData();
@@ -167,34 +173,37 @@ async function renderData() {
     type();
   }
   
-  gsap.set('.name', { opacity: 0});
 
-  setTimeout(()=>{
-
-    const element = document.querySelector(".name");
-
-    gsap.to('.name', {opacity: 1})
-
-    typingEffect(element.innerText, element);
-
-  }, 2500)
-
-  gsap.set('#bottom-section', {y: 20, opacity: 0});
-  gsap.set('.welcomeMessage', {y: 20, opacity: 0})
+const welcomeMessage = document.querySelector(".welcomeMessage");
+const name = document.querySelector(".name");
+const bottomSection = document.querySelector("#bottom-section");
+gsap.set(bottomSection, {y: 20, opacity: 0});
+gsap.set(welcomeMessage, { opacity: 0})
 
 
-  setTimeout(()=>{
+     
+const tl = gsap.timeline()
+
+const typing = (name, element)=>{
+    typingEffect(name.innerText, element)
+}
+
+typing(name, name);
+
+setTimeout(()=>{
+
+    typingEffect(welcomeMessage.innerText, welcomeMessage); 
+    tl.to(welcomeMessage, {opacity: 1})
+   tl.to(bottomSection, {delay:1, opacity: 1})
 
 
-    const element = document.querySelector(".welcomeMessage");
 
-    gsap.to('.welcomeMessage', {opacity: 1})
+  
+
+}, 1200)
 
 
-    typingEffect(element.innerText, element);
 
-   gsap.to('#bottom-section', {y: 0,  ease: "power2.out", opacity: 1, delay:0.02})
 
-    
-  }, 4500)
+
 

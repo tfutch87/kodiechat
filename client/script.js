@@ -142,6 +142,8 @@ function closePopUp(){
 
     tl.to('.footer-text', {y:0})
 
+    tl.to('.scroll-down', {opacity: 1})
+
 }
 
 
@@ -204,6 +206,10 @@ setTimeout(()=>{
 
 
 
+document.querySelector('#form').addEventListener('click', ()=>{
 
+    document.querySelector('.scroll-down').style.display = "none";
+
+})
 
 

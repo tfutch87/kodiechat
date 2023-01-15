@@ -2,8 +2,17 @@ import express from 'express'
 import * as dotenv from 'dotenv'
 import cors from 'cors'
 import { Configuration, OpenAIApi } from 'openai'
+import mongoose from 'mongoose';
 
 dotenv.config()
+
+// Connection URL
+const url = process.env.MONGODB_URL;
+mongoose.set('strictQuery', true);
+const Schema = mongoose.Schema;
+// const client = new MongoClient(url);
+// const db = client.db(process.env.MONGODB_NAME);
+// const collection = db.collection('QuestionsAnswers');
 
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
@@ -15,6 +24,17 @@ const app = express()
 app.use(cors())
 app.use(express.json())
 
+
+// DB Schema
+const QA = new Schema({
+  question: String,
+  answer: String
+});
+
+// creating the model/collection
+const MyModel = mongoose.model('QuestionsAnswers', QA);
+
+
 app.get('/', async (req, res) => {
   res.status(200).send({
     message: 'Hello from CodeX!'
@@ -23,12 +43,12 @@ app.get('/', async (req, res) => {
 
 app.post('/', async (req, res) => {
   try {
-    const prompt = req.body.prompt;
 
+    const prompt = req.body.prompt;
     const response = await openai.createCompletion({
       model: "text-davinci-003",
       prompt: `${prompt}`,
-      temperature: 0, // Higher values means the model will take more risks.
+      temperature: 1, // Higher values means the model will take more risks.
       max_tokens: 3000, // The maximum number of tokens to generate in the completion. Most models have a context length of 2048 tokens (except for the newest models, which support 4096).
       top_p: 1, // alternative to sampling with temperature, called nucleus sampling
       frequency_penalty: 0.5, // Number between -2.0 and 2.0. Positive values penalize new tokens based on their existing frequency in the text so far, decreasing the model's likelihood to repeat the same line verbatim.
@@ -37,7 +57,16 @@ app.post('/', async (req, res) => {
 
     res.status(200).send({
       bot: response.data.choices[0].text
-    });
+    })
+
+    // saves new questions ad answers to DB 
+    const myModel = new MyModel({
+      question: req.body.prompt,
+      answer: response.data.choices[0].text
+    })
+
+
+    myModel.save().then(() => console.log('saved'));;
 
   } catch (error) {
     console.error(error)
@@ -45,4 +74,23 @@ app.post('/', async (req, res) => {
   }
 })
 
-app.listen(5000, () => console.log('AI server started on http://localhost:5000'))
+
+
+app.get('/allqas' , async (req , res)=>{
+
+  const allQas = await MyModel.find();  
+
+  res.status(200).send({
+    qas: allQas
+  })
+
+})
+
+
+app.listen(5000, () => {
+
+  console.log('DB and Server has started on http://localhost:5000')
+  mongoose.connect(url)
+    .then(() => console.log('Connected!'));
+
+})

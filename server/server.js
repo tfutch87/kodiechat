@@ -4,7 +4,9 @@ import cors from 'cors'
 import { Configuration, OpenAIApi } from 'openai'
 import mongoose from 'mongoose';
 
-dotenv.config()
+
+dotenv.config();
+
 
 // Connection URL
 const url = process.env.MONGODB_URL;
@@ -23,7 +25,9 @@ const openai = new OpenAIApi(configuration);
 const app = express()
 app.use(cors())
 app.use(express.json())
-
+// set the view engine to ejs
+app.set('view engine', 'ejs');
+app.use('/', express.static('public'));
 
 // DB Schema
 const QA = new Schema({
@@ -39,7 +43,9 @@ app.get('/', async (req, res) => {
   res.status(200).send({
     message: 'Hello from CodeX!'
   })
-})
+});
+
+
 
 app.post('/', async (req, res) => {
   try {
@@ -76,9 +82,12 @@ app.post('/', async (req, res) => {
 
 
 
-app.get('/allqas' , async (req , res)=>{
+app.get('/dashboard', async (req, res) => {
 
-  const allQas = await MyModel.find();  
+  // const allQas = await MyModel.find(); 
+  // executes, name LIKE john and only selecting the "name" and "friends" fields
+
+  const allQas = await MyModel.find({ answer: /business/i }, 'answer').exec();
 
   res.status(200).send({
     qas: allQas
@@ -86,6 +95,37 @@ app.get('/allqas' , async (req , res)=>{
 
 })
 
+app.get('/search', async (req, res) => {
+
+  const search = req.query.search;
+
+    // const allQas = await MyModel.find();  
+
+    const searchResults = await MyModel.find({ 
+      $or:[
+       { answer: {$regex: `${search}`} },
+       { question: {$regex: `${search}`} }
+
+      ]
+      
+    
+    }).exec();
+
+  res.render('pages/results', { search: searchResults });
+
+})
+
+app.get('/index', async (req, res) => {
+
+  // const allQas = await MyModel.find();  
+
+  const allQas = await MyModel.find().exec();
+
+  var tagline = "No programming concept is complete without a cute animal mascot.";
+
+  res.render('pages/index', { allQas: allQas });
+
+})
 
 app.listen(5000, () => {
 

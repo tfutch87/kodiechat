@@ -1,0 +1,43 @@
+<%- include('../partials/head'); %>
+
+
+<%- include('../partials/svg'); %>
+
+<%- include('../partials/sideBar'); %>
+
+<div>
+
+   <p>Returns: <strong><%= search.length %></strong></p> 
+
+    <div class="col-sm-12 col-lg-12 order-2">
+        <div class="row">
+        <% search.map((item)=>{ %>
+
+           
+            <div class="card mb-5 col-lg-12 col-sm-12">
+             
+                <div class="card-body">
+                    <span class="card-img mr-3">
+                        <img src="https://picsum.photos/30/30?random=1" alt="" class="img-fluid rounded-circle">
+                    </span>
+                <strong>Question: </strong> <%= item.question %> 
+                </div>
+                <div class="card-footer">
+                    <span class="card-img mr-3">
+                        <img src="https://picsum.photos/30/30?random=2" alt="" class="img-fluid rounded-circle">
+                    </span>
+                 <strong>Answer:  </strong>  <%= item.answer %>
+                </div>
+               </div>
+            
+
+
+      <%  }) %>
+        
+    </div>
+    </div>
+   
+    </div>
+
+
+<%- include('../partials/footer'); %>
